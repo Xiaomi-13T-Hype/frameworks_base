@@ -855,7 +855,7 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
 
         /** Time in milliseconds until we expect the wallpaper to reconnect (unless we're in the
          *  middle of an update). If exceeded, the wallpaper gets reset to the system default. */
-        private static final long WALLPAPER_RECONNECT_TIMEOUT_MS = 10000;
+        private static final long WALLPAPER_RECONNECT_TIMEOUT_MS = 30000;
         private int mLmkLimitRebindRetries = LMK_RECONNECT_REBIND_RETRIES;
 
         final WallpaperInfo mInfo;
@@ -863,6 +863,32 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
         WallpaperData mWallpaper;
         final int mClientUid;
         IRemoteCallback mReply;
+
+        private boolean isRecentMemoryKill(ComponentName wpService) {
+            if (wpService == null) return false;
+            try {
+                List<ApplicationExitInfo> reasonList =
+                        mActivityManager.getHistoricalProcessExitReasons(
+                        wpService.getPackageName(), 0, 1);
+                if (reasonList != null && !reasonList.isEmpty()) {
+                    ApplicationExitInfo info = reasonList.get(0);
+                    int reason = info.getReason();
+                    int subReason = info.getSubReason();
+                    String desc = info.getDescription();
+                    if (reason == ApplicationExitInfo.REASON_LOW_MEMORY
+                            || reason == ApplicationExitInfo.REASON_SIGNALED
+                            || subReason == ApplicationExitInfo.SUBREASON_MEMORY_PRESSURE
+                            || (desc != null && desc.contains("memory"))) {
+                        return true;
+                    }
+                }
+            } catch (Exception e) {
+                Slog.w(TAG, "Failed to check historical process exit reasons", e);
+            }
+            return false;
+        }
+
+        private Runnable mTryToRebindRunnable = this::tryToRebind;
 
         private Runnable mResetRunnable = () -> {
             synchronized (mLock) {
@@ -881,14 +907,19 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
                 }
 
                 if (!mWallpaper.wallpaperUpdating && mWallpaper.userId == mCurrentUserId) {
+                    if (isRecentMemoryKill(mWallpaper.getComponent())) {
+                        Slog.w(TAG, "Wallpaper reconnect timed out during memory pressure for "
+                                + mWallpaper.getComponent() + ", retrying rebind later instead of reverting!");
+                        mContext.getMainThreadHandler().postDelayed(mTryToRebindRunnable,
+                                LMK_RECONNECT_DELAY_MS);
+                        return;
+                    }
                     Slog.w(TAG, "Wallpaper reconnect timed out for " + mWallpaper.getComponent()
                             + ", reverting to built-in wallpaper!");
                     clearWallpaperLocked(mWallpaper.mWhich, mWallpaper.userId, false, null);
                 }
             }
         };
-
-        private Runnable mTryToRebindRunnable = this::tryToRebind;
 
         WallpaperConnection(WallpaperInfo info, WallpaperData wallpaper, int clientUid) {
             mInfo = info;
@@ -1077,13 +1108,20 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
                     Slog.w(TAG, "Rebind fail! Try again later");
                     mContext.getMainThreadHandler().postDelayed(mTryToRebindRunnable, 1000);
                 } else {
-                    // Timeout
-                    Slog.w(TAG, "Reverting to built-in wallpaper!");
-                    clearWallpaperLocked(mWallpaper.mWhich, mWallpaper.userId, false, null);
-                    final String flattened = mWallpaper.getComponent().flattenToString();
-                    EventLog.writeEvent(EventLogTags.WP_WALLPAPER_CRASHED,
-                            flattened.substring(0, Math.min(flattened.length(),
-                                    MAX_WALLPAPER_COMPONENT_LOG_LENGTH)));
+                    if (isRecentMemoryKill(mWallpaper.getComponent())) {
+                        Slog.w(TAG, "Rebind timed out during memory pressure, retrying later instead of reverting!");
+                        mWallpaper.lastDiedTime = SystemClock.uptimeMillis();
+                        mContext.getMainThreadHandler().postDelayed(mTryToRebindRunnable,
+                                LMK_RECONNECT_DELAY_MS);
+                    } else {
+                        // Timeout
+                        Slog.w(TAG, "Reverting to built-in wallpaper!");
+                        clearWallpaperLocked(mWallpaper.mWhich, mWallpaper.userId, false, null);
+                        final String flattened = mWallpaper.getComponent().flattenToString();
+                        EventLog.writeEvent(EventLogTags.WP_WALLPAPER_CRASHED,
+                                flattened.substring(0, Math.min(flattened.length(),
+                                        MAX_WALLPAPER_COMPONENT_LOG_LENGTH)));
+                    }
                 }
             }
         }
@@ -1102,24 +1140,33 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
                                 mActivityManager.getHistoricalProcessExitReasons(
                                 wpService.getPackageName(), 0, 1);
                         int exitReason = ApplicationExitInfo.REASON_UNKNOWN;
+                        int exitSubReason = ApplicationExitInfo.SUBREASON_UNKNOWN;
+                        String exitDesc = null;
                         if (reasonList != null && !reasonList.isEmpty()) {
                             ApplicationExitInfo info = reasonList.get(0);
                             exitReason = info.getReason();
+                            exitSubReason = info.getSubReason();
+                            exitDesc = info.getDescription();
                         }
-                        Slog.d(TAG, "exitReason: " + exitReason);
-                        // If exit reason is LOW_MEMORY_KILLER
-                        // delay the mTryToRebindRunnable for 10s
-                        if (exitReason == ApplicationExitInfo.REASON_LOW_MEMORY) {
+                        Slog.d(TAG, "exitReason: " + exitReason + " subReason: " + exitSubReason
+                                + " desc: " + exitDesc);
+
+                        boolean isMemoryKill = (exitReason == ApplicationExitInfo.REASON_LOW_MEMORY)
+                                || (exitReason == ApplicationExitInfo.REASON_SIGNALED)
+                                || (exitSubReason == ApplicationExitInfo.SUBREASON_MEMORY_PRESSURE)
+                                || (exitDesc != null && exitDesc.contains("memory"));
+
+                        if (isMemoryKill) {
                             if (isRunningOnLowMemory()) {
-                                Slog.i(TAG, "Rebind is delayed due to lmk");
+                                Slog.i(TAG, "Rebind is delayed due to memory pressure");
                                 mContext.getMainThreadHandler().postDelayed(mTryToRebindRunnable,
                                         LMK_RECONNECT_DELAY_MS);
                                 mLmkLimitRebindRetries = LMK_RECONNECT_REBIND_RETRIES;
                             } else {
                                 if (mLmkLimitRebindRetries <= 0) {
-                                    Slog.w(TAG, "Reverting to built-in wallpaper due to lmk!");
-                                    clearWallpaperLocked(
-                                            mWallpaper.mWhich, mWallpaper.userId, false, null);
+                                    Slog.w(TAG, "Memory pressure rebind limit reached, retrying later instead of clearing wallpaper!");
+                                    mContext.getMainThreadHandler().postDelayed(mTryToRebindRunnable,
+                                            LMK_RECONNECT_DELAY_MS * 3);
                                     mLmkLimitRebindRetries = LMK_RECONNECT_REBIND_RETRIES;
                                     return;
                                 }

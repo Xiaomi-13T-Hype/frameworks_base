@@ -1897,7 +1897,7 @@ public class CameraDeviceImpl extends CameraDevice
             TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
             splitter.setString(packageList);
             for (String str : splitter) {
-                if (packageName.equals(str)) {
+                if (packageName.equals(str) || "*".equals(str)) {
                     return true;
                 }
             }

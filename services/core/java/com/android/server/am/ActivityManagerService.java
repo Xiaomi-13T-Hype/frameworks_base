@@ -20341,6 +20341,21 @@ public class ActivityManagerService extends IActivityManager.Stub
         return mActivityTaskManager.shouldForceCutoutFullscreen(packageName);
     }
 
+    private boolean isWallpaperProcess(ProcessRecord proc) {
+        if (proc == null || proc.mServices == null) return false;
+        try {
+            final int numServices = proc.mServices.numberOfRunningServices();
+            for (int i = 0; i < numServices; i++) {
+                final ServiceRecord sr = proc.mServices.getRunningServiceAt(i);
+                if (sr != null && android.Manifest.permission.BIND_WALLPAPER.equals(sr.permission)) {
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
     @Override
     public void releaseMemory(int minAdj, int maxKillCount,
                               boolean includeUIProcesses, boolean skipCamera) {
@@ -20363,6 +20378,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                     if (state <= ActivityManager.PROCESS_STATE_IMPORTANT_FOREGROUND) return;
                     if (state == ActivityManager.PROCESS_STATE_HOME) return;
                     if (!includeUIProcesses && proc.hasActivities()) return;
+                    if (isWallpaperProcess(proc)) return;
 
                     if (setAdj >= minAdj) victims.add(proc);
                 });

@@ -2613,12 +2613,15 @@ public class UsbDeviceManager implements ActivityTaskManagerInternal.ScreenObser
                             SET_FUNCTIONS_TIMEOUT_MS);
                     if (mConnected) {
                         // Only queue timeout of enumeration when the USB is connected
+                        int enumerationTimeout = ((config & UsbManager.FUNCTION_UVC) != 0)
+                                ? 10000 : ENUMERATION_TIME_OUT_MS;
                         sendMessageDelayed(MSG_FUNCTION_SWITCH_TIMEOUT, chargingFunctions,
-                                SET_FUNCTIONS_TIMEOUT_MS + ENUMERATION_TIME_OUT_MS);
+                                SET_FUNCTIONS_TIMEOUT_MS + enumerationTimeout);
                     }
                     if (DEBUG) Slog.d(TAG, "timeout message queued");
-                } catch (Exception e) {//RemoteException e) {
+                } catch (Exception e) {
                     Slog.e(TAG, "Remoteexception while calling setCurrentUsbFunctions", e);
+                    mUsbGadgetHal = UsbGadgetHalInstance.getInstance(mUsbDeviceManager, null);
                 }
             }
         }

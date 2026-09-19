@@ -342,7 +342,7 @@ public class SurfaceUtils {
             TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
             splitter.setString(packageList);
             for (String str : splitter) {
-                if (packageName.equals(str)) {
+                if (packageName.equals(str) || "*".equals(str)) {
                     return true;
                 }
             }

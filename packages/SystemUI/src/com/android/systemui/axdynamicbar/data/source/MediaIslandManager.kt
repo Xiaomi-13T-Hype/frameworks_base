@@ -92,12 +92,12 @@ constructor(
             _mediaEvent.update { event -> event?.copy(mediaColor = color) }
         }
 
-        override fun onAlbumArtChanged(drawable: Drawable) {
+        override fun onAlbumArtChanged(drawable: Drawable?) {
             sessionAlbumArt = drawable
             _mediaEvent.update { event -> event?.copy(albumArt = drawable) }
         }
 
-        override fun onAppIconChanged(drawable: Drawable) {
+        override fun onAppIconChanged(drawable: Drawable?) {
             sessionAppIcon = drawable
             _mediaEvent.update { event -> event?.copy(appIcon = drawable) }
         }

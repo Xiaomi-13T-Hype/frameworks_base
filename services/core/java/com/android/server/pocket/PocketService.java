@@ -212,7 +212,7 @@ public class PocketService extends SystemService implements IBinder.DeathRecipie
         public void onChange(boolean selfChange) {
             final boolean enabled = System.getIntForUser(mContext.getContentResolver(),
                     POCKET_JUDGE, 0 /* default */, UserHandle.USER_CURRENT) != 0;
-            setEnabled(enabled);
+            mHandler.post(() -> setEnabled(enabled));
         }
 
         public void register() {
@@ -488,12 +488,12 @@ public class PocketService extends SystemService implements IBinder.DeathRecipie
         if (enabled != mEnabled) {
             mEnabled = enabled;
             mHandler.removeCallbacksAndMessages(null);
-            update();
+            mHandler.post(this::update);
         }
     }
 
     private void update() {
-        if (!mSupportedByDevice){
+        if (!mSupportedByDevice || !mSystemBooted || !mSystemReady){
             return;
         }
         if (!mEnabled || mInteractive) {
@@ -510,7 +510,7 @@ public class PocketService extends SystemService implements IBinder.DeathRecipie
     }
 
     private void registerSensorListeners() {
-        if (!mSupportedByDevice){
+        if (!mSupportedByDevice || !mSystemBooted || !mSystemReady){
             return;
         }
         startListeningForVendorSensor();
@@ -641,7 +641,7 @@ public class PocketService extends SystemService implements IBinder.DeathRecipie
         }
         mSystemReady = true;
 
-        if (mPending) {
+        if (mPending && mSystemBooted) {
             final Message msg = new Message();
             msg.what = PocketHandler.MSG_INTERACTIVE_CHANGED;
             msg.arg1 = mInteractive ? 1 : 0;
@@ -661,6 +661,8 @@ public class PocketService extends SystemService implements IBinder.DeathRecipie
             msg.arg1 = mInteractive ? 1 : 0;
             mHandler.sendMessage(msg);
             mPending = false;
+        } else {
+            update();
         }
     }
 
@@ -710,7 +712,7 @@ public class PocketService extends SystemService implements IBinder.DeathRecipie
             // should prevent external processes to register while interactive,
             // while they are allowed to stop listening in any case as for example
             // coming pocket lock will need to.
-            if (!mInteractive) {
+            if (!mInteractive && mSystemBooted && mSystemReady) {
                 registerSensorListeners();
             }
         } else {

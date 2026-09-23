@@ -475,9 +475,9 @@ public class UsbDeviceManager implements ActivityTaskManagerInternal.ScreenObser
         mUEventObserver.startObserving(ACCESSORY_START_MATCH);
 
         mEnableUdcSysfsUsbStateUpdate =
-                android.hardware.usb.flags.Flags.enableUdcSysfsUsbStateUpdate()
-                && context.getResources().getBoolean(R.bool.config_enableUdcSysfsUsbStateUpdate)
-                && SELinux.getGenfsLabelsVersion() > MIN_SELINUX_GENFS_LABELS_VERSION;
+                context.getResources().getBoolean(R.bool.config_enableUdcSysfsUsbStateUpdate)
+                || (android.hardware.usb.flags.Flags.enableUdcSysfsUsbStateUpdate()
+                && SELinux.getGenfsLabelsVersion() > MIN_SELINUX_GENFS_LABELS_VERSION);
 
         if (mEnableUdcSysfsUsbStateUpdate) {
             mUEventObserver.startObserving(UDC_SUBSYS_MATCH);

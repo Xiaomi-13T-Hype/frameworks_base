@@ -364,8 +364,48 @@ public final class WebViewFactory {
 
                 Trace.traceBegin(Trace.TRACE_TAG_WEBVIEW, "WebViewFactoryProvider invocation");
                 try {
-                    sProviderInstance = (WebViewFactoryProvider)
-                            staticFactory.invoke(null, new WebViewDelegate());
+                    try {
+                        sProviderInstance = (WebViewFactoryProvider)
+                                staticFactory.invoke(null, new WebViewDelegate());
+                    } catch (Exception invokeEx) {
+                        Throwable root = invokeEx;
+                        while (root.getCause() != null && root.getCause() != root) {
+                            root = root.getCause();
+                        }
+                        if (root instanceof IllegalStateException && root.getMessage() != null
+                                && root.getMessage().contains("Already registered a list of actions in this process")) {
+                            Log.w(LOGTAG, "Recovering from duplicate SafeModeAction registration in WebView", invokeEx);
+                            try {
+                                Method getSingleton = providerClass.getDeclaredMethod("getSingleton");
+                                getSingleton.setAccessible(true);
+                                sProviderInstance = (WebViewFactoryProvider) getSingleton.invoke(null);
+                            } catch (Throwable ignored) {
+                            }
+                            if (sProviderInstance == null) {
+                                try {
+                                    Class<?> smcClass = Class.forName(
+                                            "org.chromium.android_webview.common.SafeModeController",
+                                            true, providerClass.getClassLoader());
+                                    Method getInstance = smcClass.getDeclaredMethod("getInstance");
+                                    getInstance.setAccessible(true);
+                                    Object smc = getInstance.invoke(null);
+                                    for (java.lang.reflect.Field f : smcClass.getDeclaredFields()) {
+                                        if (f.getType().isArray() && !java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
+                                            f.setAccessible(true);
+                                            f.set(smc, null);
+                                        }
+                                    }
+                                    sProviderInstance = (WebViewFactoryProvider)
+                                            staticFactory.invoke(null, new WebViewDelegate());
+                                } catch (Throwable retryEx) {
+                                    Log.e(LOGTAG, "Failed retry after resetting SafeModeController", retryEx);
+                                }
+                            }
+                        }
+                        if (sProviderInstance == null) {
+                            throw invokeEx;
+                        }
+                    }
                     if (DEBUG) Log.v(LOGTAG, "Loaded provider: " + sProviderInstance);
                     return sProviderInstance;
                 } finally {
@@ -376,6 +416,23 @@ public final class WebViewFactory {
                 throw new AndroidRuntimeException(e);
             } finally {
                 Trace.traceEnd(Trace.TRACE_TAG_WEBVIEW);
+            }
+        }
+    }
+
+    /**
+     * @hide
+     */
+    public static ClassLoader getWebViewClassLoader() {
+        synchronized (sProviderLock) {
+            if (sProviderInstance != null) {
+                return sProviderInstance.getWebViewClassLoader();
+            }
+            try {
+                Class<WebViewFactoryProvider> providerClass = getProviderClass();
+                return providerClass.getClassLoader();
+            } catch (Throwable e) {
+                return null;
             }
         }
     }

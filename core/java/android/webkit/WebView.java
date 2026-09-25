@@ -2430,7 +2430,17 @@ public class WebView extends AbsoluteLayout
      */
     @NonNull
     public static ClassLoader getWebViewClassLoader() {
-        return getFactory().getWebViewClassLoader();
+        try {
+            return getFactory().getWebViewClassLoader();
+        } catch (Throwable e) {
+            Log.w(LOGTAG, "Failed to get WebViewClassLoader from factory provider, trying fallback", e);
+            try {
+                ClassLoader cl = WebViewFactory.getWebViewClassLoader();
+                if (cl != null) return cl;
+            } catch (Throwable ignored) {
+            }
+            throw e;
+        }
     }
 
     /**

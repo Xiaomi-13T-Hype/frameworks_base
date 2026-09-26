@@ -77,6 +77,56 @@
     <string name="battery_notification_channel_tv">Предупреждение батареи</string>
     <string name="screenshot_delete_label">Удалить</string>
     <string name="screenshot_delete_description">Удалить скриншот</string>
+    <!-- Adaptive brightness -->
+    <string name="accessibility_adaptive_brightness">Адаптивная яркость</string>
+
+    <!-- Heads up less boring -->
+    <string name="accessibility_quick_settings_heads_up_less_boring">Менее навязчивые всплывающие уведомления включены.</string>
+    <string name="quick_settings_heads_up_less_boring_label">Менее навязчивые</string>
+
+    <!-- Flashlight strength -->
+    <string name="flashlight_strength_title">Яркость фонарика</string>
+    <string name="flashlight_strength_turn_off">Выключить</string>
+    <string name="flashlight_strength_turn_on">Включить</string>
+
+    <!-- Screenrecord video quality -->
+    <string name="screenrecord_bitrate_label">Качество видео</string>
+    <string name="screenrecord_bitrate_high">Высокое</string>
+    <string name="screenrecord_bitrate_medium">Среднее</string>
+    <string name="screenrecord_bitrate_low">Низкое</string>
+
+    <!-- Screenrecord resolution -->
+    <string name="screenrecord_resolution_label">Разрешение</string>
+    <string name="screenrecord_resolution_auto">Авто</string>
+
+    <!-- Screenrecord FPS -->
+    <string name="screenrecord_fps_label">Частота кадров</string>
+    <string name="screenrecord_fps_auto">Авто</string>
+    <string name="screenrecord_fps_value"><xliff:g id="fps">%1$d</xliff:g> FPS</string>
+
+    <!-- Screenrecord file size limit -->
+    <string name="screenrecord_file_size_label">Ограничение размера файла</string>
+    <string name="screenrecord_size_10mb">10 МБ</string>
+    <string name="screenrecord_size_100mb">100 МБ</string>
+    <string name="screenrecord_size_500mb">500 МБ</string>
+    <string name="screenrecord_size_1gb">1 ГБ</string>
+    <string name="screenrecord_size_15gb">15 ГБ</string>
+    <string name="screenrecord_size_unlimited">Без ограничений</string>
+
+    <!-- Screenrecord time limit -->
+    <string name="screenrecord_time_limit_label">Ограничение времени</string>
+    <string name="screenrecord_time_5min">5 минут</string>
+    <string name="screenrecord_time_10min">10 минут</string>
+    <string name="screenrecord_time_30min">30 минут</string>
+    <string name="screenrecord_time_60min">60 минут</string>
+    <string name="screenrecord_time_unlimited">Без ограничений</string>
+
+    <!-- Status bar IMS icons -->
+    <string name="status_bar_volte_icon_title">VoLTE</string>
+    <string name="status_bar_vonr_icon_title">VoNR</string>
+    <string name="status_bar_vowifi_icon_title">VoWiFi</string>
+
+    <!-- Screen pinning -->
     <string name="screen_pinning_description_no_navbar">Приложение останется активным, пока вы не отмените блокировку долгим нажатием кнопки Назад.</string>
     <string name="screen_pinning_toast_no_navbar">Чтобы открепить экран, нажмите и удерживайте кнопку Назад</string>
 </resources>

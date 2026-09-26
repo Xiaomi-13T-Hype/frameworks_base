@@ -311,11 +311,11 @@ public class UsbDeviceManager implements ActivityTaskManagerInternal.ScreenObser
                         nativeStopGadgetMonitor();
                     }
                 }
-            } else {
-                String state = event.get("USB_STATE");
-                if (state != null) {
-                    mHandler.updateState(state);
-                }
+            }
+
+            String state = event.get("USB_STATE");
+            if (state != null) {
+                mHandler.updateState(state);
             }
         }
     }
@@ -476,7 +476,7 @@ public class UsbDeviceManager implements ActivityTaskManagerInternal.ScreenObser
 
         mEnableUdcSysfsUsbStateUpdate =
                 context.getResources().getBoolean(R.bool.config_enableUdcSysfsUsbStateUpdate)
-                || (android.hardware.usb.flags.Flags.enableUdcSysfsUsbStateUpdate()
+                && (android.hardware.usb.flags.Flags.enableUdcSysfsUsbStateUpdate()
                 && SELinux.getGenfsLabelsVersion() > MIN_SELINUX_GENFS_LABELS_VERSION);
 
         if (mEnableUdcSysfsUsbStateUpdate) {
@@ -491,9 +491,8 @@ public class UsbDeviceManager implements ActivityTaskManagerInternal.ScreenObser
                     Slog.v(TAG, "USB controller name " + udcName);
                 }
             }.start();
-        } else {
-            mUEventObserver.startObserving(USB_STATE_MATCH);
         }
+        mUEventObserver.startObserving(USB_STATE_MATCH);
 
         if (mEnableAoaUserspaceImplementation) {
             nativeStartVendorControlRequestMonitor();

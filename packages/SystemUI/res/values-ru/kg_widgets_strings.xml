@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2024-2026 Lunaris AOSP
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>    
+    <string name="camera">Камера</string>
+    <string name="clock_timer">Часы / Таймер</string>
+    <string name="calculator">Калькулятор</string>
+    <string name="gallery">Галерея</string>
+    <string name="no_default_app_found">Приложение по умолчанию для «%1$s» не найдено</string>
+    <string name="weather_data_unavailable">Данные недоступны</string>
+    <string name="omnijaws_weather">OmniJaws</string>
+    <string name="quick_settings_data_label">Мобильные данные</string>
+    <string name="quick_settings_ringer_label">Режим звонка</string>
+    <string name="torch_active">Фонарик включен</string>
+    <string name="google_wallet">Google Кошелек</string>
+</resources>

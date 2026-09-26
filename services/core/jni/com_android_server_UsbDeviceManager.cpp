@@ -344,6 +344,11 @@ class NativeGadgetMonitorThread {
             return;
         }
 
+        char initialState[USB_STATE_MAX_LEN] = {0};
+        lseek(mMonitorFd.get(), 0, SEEK_SET);
+        read(mMonitorFd.get(), &initialState, USB_STATE_MAX_LEN);
+        handleStateUpdate(initialState);
+
         struct epoll_event events[EPOLL_MAX_EVENTS];
         int nevents = 0;
         while (true) {

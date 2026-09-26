@@ -1724,4 +1724,33 @@
     <string name="pager_dots_next_content_description" msgid="613943992626163120">"Далее"</string>
     <string name="ambient_cue_autofill_action" msgid="9213025887835308128">"автозаполнение"</string>
     <string name="ambient_cue_expand_action" msgid="6803711089932959312">"развернуть"</string>
+
+    <!-- Missing translations -->
+    <string name="accessibility_casting">@string/quick_settings_casting</string>
+    <string name="accessibility_pager_dots_navigate_to_next_page_action">перейти к следующей странице</string>
+    <string name="accessibility_status_bar_volte">VoLTE</string>
+    <string name="accessibility_status_bar_vonr">VoNR</string>
+    <string name="accessibility_status_bar_vowifi">Вызовы по Wi-Fi</string>
+    <string name="dynamic_island_action_lap">Круг</string>
+    <string name="dynamic_island_action_resume">Возобновить</string>
+    <string name="dynamic_island_action_snooze">Отложить</string>
+    <string name="dynamic_island_action_stop">Стоп</string>
+    <string name="dynamic_island_alarm_active_title">Будильник</string>
+    <string name="dynamic_island_alarm_title">Следующий будильник</string>
+    <string name="dynamic_island_flashlight_enabled">Включен</string>
+    <string name="dynamic_island_flashlight_short">ВКЛ</string>
+    <string name="dynamic_island_open_action">Открыть</string>
+    <string name="dynamic_island_open_clock_action">Открыть часы</string>
+    <string name="dynamic_island_screen_record_active">Идет запись экрана</string>
+    <string name="dynamic_island_screen_record_countdown">Начнется через %1$s с</string>
+    <string name="dynamic_island_screen_record_short">ЗАП</string>
+    <string name="dynamic_island_stopwatch_title">Секундомер</string>
+    <string name="keyguard_face_failed_use_fp">@string/fingerprint_dialog_use_fingerprint_instead</string>
+    <string name="media_projection_entry_app_permission_dialog_option_text_entire_screen">@string/screen_share_permission_dialog_option_entire_screen</string>
+    <string name="media_projection_entry_app_permission_dialog_option_text_single_app">@string/screen_share_permission_dialog_option_single_app</string>
+    <string name="status_bar_classic_icons_summary">Залитые значки Wi-Fi, мобильной сети и батареи</string>
+    <string name="status_bar_classic_icons_title">Классические значки в строке состояния</string>
+    <string name="tuner_restart_systemui_dialog_message">Для применения изменений необходимо перезапустить SystemUI. Продолжить?</string>
+    <string name="tuner_restart_systemui_dialog_title">Перезапустить SystemUI?</string>
+    <string name="zen_alarm_warning_indef">Вы не услышите следующий будильник <xliff:g id="when" example="в 7:00">%1$s</xliff:g>, если не отключите этот режим заранее</string>
 </resources>

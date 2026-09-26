@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2024-2026 Lunaris AOSP
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string name="app_info_install_time">Установлено: %1$s</string>
+    <string name="app_info_update_time">Обновлено: %1$s</string>
+</resources>

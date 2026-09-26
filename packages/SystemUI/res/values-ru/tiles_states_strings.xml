@@ -206,4 +206,9 @@
     <item msgid="6641673879029894995">"Отключено"</item>
     <item msgid="5806682401126108403">"Включено"</item>
   </string-array>
+  <string-array name="tile_states_default">
+    <item>@string/tile_unavailable</item>
+    <item>@string/switch_bar_off</item>
+    <item>@string/switch_bar_on</item>
+  </string-array>
 </resources>

@@ -174,4 +174,6 @@
     <string name="open_by_default_dialog_in_browser_text" msgid="8042769465958497081">"В браузере"</string>
     <string name="open_by_default_dialog_dismiss_button_text" msgid="3487238795534582291">"ОК"</string>
     <string name="desktop_windowing_app_to_web_education_text" msgid="1599668769538703570">"Здесь можно быстро открывать приложения в браузере"</string>
+    <string name="pip_phone_dismiss_hint">Перетащите вниз, чтобы закрыть</string>
+    <string name="pip_phone_minimize">Свернуть</string>
 </resources>

@@ -100,6 +100,7 @@ public class BackAnimationBackground {
         mBackgroundSurface = colorLayerBuilder.build();
         transaction.setColor(mBackgroundSurface, colorComponents)
                 .setLayer(mBackgroundSurface, BACKGROUND_LAYER)
+                .setTrustedOverlay(mBackgroundSurface, true)
                 .show(mBackgroundSurface);
         if (cropBounds != null && !cropBounds.isEmpty()) {
             transaction.setCrop(mBackgroundSurface, cropBounds)

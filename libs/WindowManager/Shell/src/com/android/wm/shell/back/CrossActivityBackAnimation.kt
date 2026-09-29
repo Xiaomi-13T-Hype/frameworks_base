@@ -423,6 +423,7 @@ abstract class CrossActivityBackAnimation(
             .setAlpha(scrimLayer!!, maxScrimAlpha)
             .setCrop(scrimLayer!!, scrimCrop)
             .setRelativeLayer(scrimLayer!!, closingTarget!!.leash, -1)
+            .setTrustedOverlay(scrimLayer!!, true)
             .show(scrimLayer)
     }
 
@@ -490,6 +491,7 @@ abstract class CrossActivityBackAnimation(
             .setColor(layer, colorComponents)
             .setCrop(layer, bounds)
             .setRelativeLayer(layer, closingTarget!!.leash, 1)
+            .setTrustedOverlay(layer, true)
             .show(layer)
         return layer
     }

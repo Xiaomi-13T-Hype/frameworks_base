@@ -9504,6 +9504,9 @@
     <!-- Attribution for Device Policy Manager service. -->
     <attribution android:tag="DevicePolicyManagerService"
         android:label="@string/device_policy_manager_service"/>
+    <!-- Attribution for Virtual Cellular Network (VCN) service. -->
+    <attribution android:tag="VCN"
+        android:label="@string/android_system_label"/>
 
     <application android:process="system"
                  android:persistent="true"

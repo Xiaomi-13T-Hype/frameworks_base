@@ -1685,13 +1685,19 @@ class WindowOrganizerController extends IWindowOrganizerController.Stub
                     Slog.e(TAG, "No transition to set animation delegate on");
                     break;
                 }
-                // Unfortunately, IApplicationThread.Stub.asInterface will make a random Proxy
-                // object if the binder isn't the correct interface (instead of returning null),
-                // so we have to do our own check.
                 final IBinder binder = hop.getCaller();
-                android.os.IInterface iin = binder.queryLocalInterface(
-                        IApplicationThread.Stub.DESCRIPTOR);
-                if (!(iin instanceof IApplicationThread)) {
+                if (binder == null) {
+                    Slog.e(TAG, "No caller binder to set animation delegate");
+                    break;
+                }
+                final IApplicationThread appThread = IApplicationThread.Stub.asInterface(binder);
+                boolean isValid = false;
+                try {
+                    isValid = IApplicationThread.Stub.DESCRIPTOR.equals(binder.getInterfaceDescriptor());
+                } catch (RemoteException e) {
+                    Slog.w(TAG, "Failed to get interface descriptor for " + binder, e);
+                }
+                if (!isValid && mService.getProcessController(appThread) == null) {
                     Slog.e(TAG, "Not a valid process token: " + binder);
                     break;
                 }
@@ -1700,7 +1706,7 @@ class WindowOrganizerController extends IWindowOrganizerController.Stub
                             + transition.getSyncId());
                     break;
                 }
-                transition.mRemoteDelegate = IApplicationThread.Stub.asInterface(hop.getCaller());
+                transition.mRemoteDelegate = appThread;
             }
         }
         return effects;
